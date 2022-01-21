@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load cache %}
+{% block title %}
+	{{ title }}
+{% endblock %}
+{% block content %}
+	<div class="mb-5">
+		<h1>Все посты пользователя {{ author.get_full_name }}</h1>
+		<h3>Всего постов: {{ author.posts.count }}</h3>
+		{% if user.is_authenticated and user != author %}
+			{% if follow %}
+				<a
+						class="btn btn-lg btn-light"
+						href="{% url 'posts:profile_unfollow' author.username %}" role="button"
+				>
+					Отписаться
+				</a>
+			{% else %}
+				<a
+						class="btn btn-lg btn-primary"
+						href="{% url 'posts:profile_follow' author.username %}" role="button"
+				>
+					Подписаться
+				</a>
+			{% endif %}
+		{% endif %}
+	</div>
+	<div class="container py-5">
+		{% cache 20 profile_page page_obj.number %}
+			{% for post in page_obj %}
+				{% include 'posts/post_list.html' %}
+			{% endfor %}
+		{% endcache %}
+		{% include 'posts/includes/paginator.html' %}
+	</div>
+{% endblock %}

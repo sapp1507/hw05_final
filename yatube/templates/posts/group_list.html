@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load cache %}
+{% block title %}
+	Группа {{ group.title }}
+{% endblock %}
+{% block content %}
+	<div class="container py-5">
+		<h1>
+			{{ group.title }}
+		</h1>
+		<p>
+			{{ group.description }}
+		</p>
+		{% include 'posts/includes/paginator.html' %}
+		{% cache 20 group_page page_obj.number %}
+			{% for post in page_obj %}
+				{% include 'posts/post_list.html' %}
+				{% empty %}
+				<p>Нет постов</p>
+			{% endfor %}
+		{% endcache %}
+		{% include 'posts/includes/paginator.html' %}
+	</div>
+{% endblock  %}

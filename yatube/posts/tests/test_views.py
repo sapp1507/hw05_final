@@ -65,7 +65,7 @@ class PostViewsTest(TestCase):
                                  kwargs={'slug': cls.group_one.slug}),
             'group_two': reverse('posts:group_posts_page',
                                  kwargs={'slug': cls.group_two.slug}),
-            'profile': reverse('posts:profile',kwargs=kwargs_user),
+            'profile': reverse('posts:profile', kwargs=kwargs_user),
             'post_detail': reverse('posts:post_detail',
                                    kwargs={'post_id': check_post_id}),
             'post_edit': reverse('posts:post_edit',
@@ -362,7 +362,7 @@ class PostViewsTest(TestCase):
             followers,
             'Подписка не сработала'
         )
-        response = self.authorized_client.get(page_unfollow)
+        self.authorized_client.get(page_unfollow)
         followers = list(
             self.user.follower.all().values_list('author', flat=True))
         self.assertNotIn(

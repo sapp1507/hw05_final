@@ -115,7 +115,7 @@ class PostCreateFormTest(TestCase):
             'group': self.group.id,
             'data': uploaded,
         }
-        response = self.author_client.post(
+        self.author_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True,
@@ -192,7 +192,7 @@ class PostCreateFormTest(TestCase):
         form_data = {
             'text': 'new comment',
         }
-        response = self.client.post(
+        self.client.post(
             page,
             data=form_data,
             follow=True,
@@ -214,7 +214,7 @@ class PostCreateFormTest(TestCase):
         form_data = {
             'text': 'new comment',
         }
-        response = self.author_client.post(
+        self.author_client.post(
             page,
             data=form_data,
             follow=True,
@@ -231,4 +231,3 @@ class PostCreateFormTest(TestCase):
             form_data['text'],
             'Комментарий не появился на странице поста'
         )
-

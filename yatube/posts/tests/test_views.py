@@ -354,7 +354,7 @@ class PostViewsTest(TestCase):
     def test_follow_unfollow_authorized(self):
         page_follow = self.reverse_list['post_follow']
         page_unfollow = self.reverse_list['post_unfollow']
-        response = self.authorized_client.get(page_follow)
+        self.authorized_client.get(page_follow)
         followers = list(
             self.user.follower.all().values_list('author', flat=True))
         self.assertIn(

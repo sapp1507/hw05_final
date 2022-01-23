@@ -8,7 +8,7 @@
 		<h1>Последние обновления Ваших подписок</h1>
 		{% include 'posts/includes/paginator.html' %}
 		{% include 'posts/includes/switcher.html' %}
-		{% cache 20 follow_page page_obj.number %}
+		{% cache 20 follow_page page_obj.number request.user %}
 			{% for post in page_obj %}
 				{% include 'posts/post_list.html' %}
 			{% endfor %}

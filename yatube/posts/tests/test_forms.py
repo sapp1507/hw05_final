@@ -111,20 +111,36 @@ class PostCreateFormTest(TestCase):
             content_type='image/gif'
         )
         form_data = {
-            'text': 'new text image',
+            'text': 'new text image test',
             'group': self.group.id,
-            'data': uploaded,
+            'image': uploaded,
         }
-        self.author_client.post(
+        response = self.author_client.post(
             reverse('posts:post_create'),
             data=form_data,
             follow=True,
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                'posts:profile', kwargs={'username': self.user_author})
         )
         new_post_count = Post.objects.count()
         self.assertEqual(
             post_count + 1,
             new_post_count,
             'Не изменилось количество постов'
+        )
+        expected_post = Post.objects.all().order_by('-id')[0]
+        self.assertTrue(
+            Post.objects.filter(
+                text=form_data['text'],
+                group_id=form_data['group'],
+            ).exists()
+        )
+        self.assertEqual(
+            expected_post.image,
+            'posts/small.gif',
         )
 
     def test_edit_post(self):
@@ -190,7 +206,7 @@ class PostCreateFormTest(TestCase):
             kwargs={'post_id': post_id}
         )
         form_data = {
-            'text': 'new comment',
+            'text': 'new comment test',
         }
         self.client.post(
             page,
@@ -206,10 +222,10 @@ class PostCreateFormTest(TestCase):
 
     def test_create_new_comment_for_authorized(self):
         comment_count = Comment.objects.count()
-        post_id = Post.objects.all()[0].id
+        post = Post.objects.all()[0]
         page = reverse(
             'posts:add_comment',
-            kwargs={'post_id': post_id},
+            kwargs={'post_id': post.id},
         )
         form_data = {
             'text': 'new comment',
@@ -230,4 +246,11 @@ class PostCreateFormTest(TestCase):
             expected_comment.text,
             form_data['text'],
             'Комментарий не появился на странице поста'
+        )
+        self.assertTrue(
+            Comment.objects.filter(
+                text=form_data['text'],
+                post=post,
+                author=self.user_author,
+            ).exists()
         )

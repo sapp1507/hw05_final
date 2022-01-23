@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 
 from .forms import PostForm, CommentForm
 from .models import Post, Group, Comment, Follow
@@ -11,7 +12,7 @@ def index(request):
     template = 'posts/index.html'
     title = 'Главная страница'
 
-    posts_list = Post.objects.all()
+    posts_list = Post.objects.select_related('group').all()
     page_obj = get_page_obj(posts_list, request.GET.get('page'))
     context = {
         'title': title,
@@ -40,10 +41,8 @@ def profile(request, username):
     page_obj = get_page_obj(posts_list, request.GET.get('page'))
     if not request.user.is_authenticated:
         follow = False
-    elif not request.user.follower.filter(author=author).exists():
-        follow = False
     else:
-        follow = True
+        follow = request.user.follower.filter(author=author).exists()
     context = {
         'title': title,
         'author': author,
@@ -117,7 +116,8 @@ def follow_index(request):
     title = 'Ваши подписки'
     template = 'posts/follow.html'
     follow_list = request.user.follower.all().values('author')
-    posts_list = Post.objects.filter(author__in=follow_list)
+    posts_list = Post.objects.select_related('group').filter(
+        author__in=follow_list)
     page_obj = get_page_obj(posts_list, request.GET.get('page'))
     context = {
         'title': title,
@@ -129,9 +129,8 @@ def follow_index(request):
 @login_required()
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    if (not Follow.objects.filter(user=request.user, author=author).exists()
-            and request.user != author):
-        Follow.objects.create(
+    if request.user != author:
+        Follow.objects.get_or_create(
             user=request.user,
             author=author,
         )

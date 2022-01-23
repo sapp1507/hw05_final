@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-
 User = get_user_model()
 
 
@@ -43,9 +42,14 @@ class Post(models.Model):
 
 
 class Group(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(
+        max_length=200,
+        verbose_name='Заголовок группы'
+    )
     slug = models.SlugField(max_length=30, unique=True)
-    description = models.TextField()
+    description = models.TextField(
+        verbose_name='Описание группы'
+    )
 
     def __str__(self):
         return self.title
@@ -56,7 +60,6 @@ class Comment(models.Model):
         Post,
         on_delete=models.CASCADE,
         related_name='comments',
-        help_text='Введите текст комментария'
     )
     author = models.ForeignKey(
         User,
@@ -87,4 +90,9 @@ class Follow(models.Model):
     )
 
     class Meta:
-        unique_together = ('user', 'author')
+        constraints = [
+            models.UniqueConstraint(
+                name='unique_follow',
+                fields=['user', 'author']
+            )
+        ]

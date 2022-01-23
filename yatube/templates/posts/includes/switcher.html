@@ -3,7 +3,8 @@
 		<ul class="nav nav-tabs">
 			<li class="nav-item">
 				<a
-						class="nav-link {% if request.path == '/' %}active{% endif %}"
+						class="nav-link
+							{% if request.resolver_match.url_name == 'index' %}active{% endif %}"
 						href="{% url 'posts:index' %}"
 				>
 					Все авторы {{ request.current_page.get_path }}
@@ -12,7 +13,7 @@
 			<li class="nav-item">
 				<a
 						class="nav-link
-							{% if request.path == '/follow/' %}active{% endif %}"
+							{% if request.resolver_match.url_name == 'follow_index' %}active{% endif	%}"
 						href="{% url 'posts:follow_index' %}"
 				>
 					Избранные авторы

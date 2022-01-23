@@ -6,7 +6,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.cache import cache
 from django.conf import settings
 
-
 from ..models import Post, Group, Follow
 
 User = get_user_model()
@@ -351,9 +350,8 @@ class PostViewsTest(TestCase):
             'После очистки кеша страница не изменилась'
         )
 
-    def test_follow_unfollow_authorized(self):
+    def test_follow_authorized(self):
         page_follow = self.reverse_list['post_follow']
-        page_unfollow = self.reverse_list['post_unfollow']
         self.authorized_client.get(page_follow)
         followers = list(
             self.user.follower.all().values_list('author', flat=True))
@@ -362,9 +360,17 @@ class PostViewsTest(TestCase):
             followers,
             'Подписка не сработала'
         )
+
+    def test_unfollow_authorized(self):
+        page_unfollow = self.reverse_list['post_unfollow']
+        Follow.objects.create(
+            user=self.user,
+            author=self.user_author,
+        )
         self.authorized_client.get(page_unfollow)
         followers = list(
-            self.user.follower.all().values_list('author', flat=True))
+            self.user.follower.all().values_list('author', flat=True)
+        )
         self.assertNotIn(
             self.user_author.id,
             followers,

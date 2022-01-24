@@ -132,11 +132,15 @@ class PostCreateFormTest(TestCase):
             'Не изменилось количество постов'
         )
         expected_post = Post.objects.all().order_by('-id')[0]
-        self.assertTrue(
-            Post.objects.filter(
-                text=form_data['text'],
-                group_id=form_data['group'],
-            ).exists()
+        self.assertEqual(
+            expected_post.text,
+            form_data['text'],
+            'Ожидался другой текст поста'
+        )
+        self.assertEqual(
+            expected_post.group_id,
+            form_data['group'],
+            'Ожидалась другая группа у поста'
         )
         self.assertEqual(
             expected_post.image,
@@ -245,12 +249,15 @@ class PostCreateFormTest(TestCase):
         self.assertEqual(
             expected_comment.text,
             form_data['text'],
-            'Комментарий не появился на странице поста'
+            'Ожидался другой текст комментария'
         )
-        self.assertTrue(
-            Comment.objects.filter(
-                text=form_data['text'],
-                post=post,
-                author=self.user_author,
-            ).exists()
+        self.assertEqual(
+            expected_comment.post,
+            post,
+            'Комментарий привязан не к тому посту'
+        )
+        self.assertEqual(
+            expected_comment.author,
+            self.user_author,
+            'Ожидался другой автор у комментария'
         )
